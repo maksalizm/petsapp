@@ -30,6 +30,7 @@ import android.widget.TextView;
 
 import com.example.android.pets.data.PetContract.PetEntry;
 import com.example.android.pets.data.PetDbHelper;
+import com.example.android.pets.data.PetProvider;
 
 /**
  * Displays list of pets that were entered and stored in the app.
@@ -64,49 +65,21 @@ public class CatalogActivity extends AppCompatActivity {
         displayDatabaseInfo();
     }
 
-    private void insertPet(){
-        SQLiteDatabase db = mDbHelper.getWritableDatabase();
-
-        ContentValues values = new ContentValues();
-
-        values.put(PetEntry.COLUMN_PET_NAME, "Toto");
-        values.put(PetEntry.COLUMN_PET_BREED, "Terrier");
-        values.put(PetEntry.COLUMN_PET_GENDER, 1);
-        values.put(PetEntry.COLUMN_PET_WEIGHT, 7);
-
-        long newRowId = db.insert(PetEntry.TABLE_NAME, null, values);
-
-        Log.v("CatalogActiity", "New row ID " + newRowId);
-    }
-
-
     /**
      * Temporary helper method to display information in the onscreen TextView about the state of
      * the pets database.
      */
     private void displayDatabaseInfo() {
-        // To access our database, we instantiate our subclass of SQLiteOpenHelper
-        // and pass the context, which is the current activity.
-
-        // Create and/or open a database to read from it
-        SQLiteDatabase db = mDbHelper.getReadableDatabase();
 
         String[] projection = {
                 PetEntry._ID,
                 PetEntry.COLUMN_PET_NAME,
                 PetEntry.COLUMN_PET_BREED,
                 PetEntry.COLUMN_PET_GENDER,
-                PetEntry.COLUMN_PET_WEIGHT
+                PetEntry.COLUMN_PET_WEIGHT,
         };
 
-        Cursor cursor = db.query(
-                PetEntry.TABLE_NAME,
-                projection,
-                null,
-                null,
-                null,
-                null,
-                null);
+        Cursor cursor = getContentResolver().query(PetEntry.CONTENT_URI, projection, null, null, null);
 
         try {
             // Display the number of rows in the Cursor (which reflects the number of rows in the
@@ -161,7 +134,12 @@ public class CatalogActivity extends AppCompatActivity {
         switch (item.getItemId()) {
             // Respond to a click on the "Insert dummy data" menu option
             case R.id.action_insert_dummy_data:
-                insertPet();
+                ContentValues values = new ContentValues();
+                values.put(PetEntry.COLUMN_PET_NAME, "dummy_data");
+                values.put(PetEntry.COLUMN_PET_BREED, "dummy_breed");
+                values.put(PetEntry.COLUMN_PET_GENDER, 1);
+                values.put(PetEntry.COLUMN_PET_WEIGHT, 10);
+                getContentResolver().insert(PetEntry.CONTENT_URI, values);
                 displayDatabaseInfo();
                 return true;
             // Respond to a click on the "Delete all entries" menu option
