@@ -114,12 +114,30 @@ public class PetProvider extends ContentProvider {
 
     private Uri insertPet(Uri uri, ContentValues values) {
 
+        String name = values.getAsString(PetEntry.COLUMN_PET_NAME);
+        String breed = values.getAsString(PetEntry.COLUMN_PET_BREED);
+        Integer gender = values.getAsInteger(PetEntry.COLUMN_PET_GENDER);
+        Integer weight = values.getAsInteger(PetEntry.COLUMN_PET_WEIGHT);
+
+        if (name == null) {
+            throw new IllegalArgumentException("Pet requires a name");
+        }
+        if (breed == null) {
+            throw new IllegalArgumentException("Pet requires a breed");
+        }
+        if (gender == null || !PetEntry.isValidGender(gender)) {
+            throw new IllegalArgumentException("Pet requires a gender");
+        }
+        if (weight != null && weight < 0) {
+            throw new IllegalArgumentException("Pet requires a weight");
+        }
+
         SQLiteDatabase database = mDbHelper.getWritableDatabase();
 
         long id = database.insert(PetEntry.TABLE_NAME, null, values);
 
         if (id == -1) {
-            Log.e(LOG_TAG, "Faile to insert row for " + uri);
+            Log.e(LOG_TAG, "Failed to insert row for " + uri);
             return null;
         }
 
