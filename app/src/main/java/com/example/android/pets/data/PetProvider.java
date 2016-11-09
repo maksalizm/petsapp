@@ -159,6 +159,7 @@ public class PetProvider extends ContentProvider {
         }
 
         // Notify all listeners that the data has changed for the pet content URI
+        // uri : content//com.example.android.pets/pets
         getContext().getContentResolver().notifyChange(uri, null);
 
         // Return the new URI with the ID (of the newly inserted row) appended at the end
